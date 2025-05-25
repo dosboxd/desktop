@@ -634,14 +634,31 @@ var gZenWorkspaces = new (class extends ZenMultiWindowFeature {
   _handleSwipeMayStart(event) {
     if (this.privateWindowOrDisabled || this._inChangingWorkspace) return;
     if (event.target.closest('#zen-sidebar-bottom-buttons')) return;
+    console.log(this._lastSelectedWorkspaceTabs);
+    const currentWorkspace = this.getActiveWorkspaceFromCache();
+    const allWorkspaces = this._workspaceCache.workspaces;
 
     // Only handle horizontal swipes
     if (event.direction === event.DIRECTION_LEFT || event.direction === event.DIRECTION_RIGHT) {
       event.preventDefault();
       event.stopPropagation();
 
-      // Set allowed directions based on available workspaces
-      event.allowedDirections |= event.DIRECTION_LEFT | event.DIRECTION_RIGHT;
+      console.log("--- allWorkspaces.length", allWorkspaces);
+      if (allWorkspaces.length > 1) {
+        console.log("--- More than 1");
+        if (currentWorkspace.position == allWorkspaces[0]?.position) {
+          console.log("--- First position");
+          // only right swipe
+          event.allowedDirections |= event.DIRECTION_RIGHT;
+        } else if (currentWorkspace.position == allWorkspaces[allWorkspaces.length - 1]?.position) {
+          console.log("--- Second position");
+          // only left swipe
+          event.allowedDirections |= event.DIRECTION_LEFT;
+        }
+      } else {
+        // Set allowed directions based on available workspaces
+        event.allowedDirections |= event.DIRECTION_LEFT | event.DIRECTION_RIGHT;
+      }
     }
   }
 
